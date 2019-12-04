@@ -1,0 +1,28 @@
+plugins {
+    id "java"
+    id "application"
+    id "com.github.johnrengelman.shadow" version "4.0.2"
+}
+
+version "0.1"
+group "org.graalvm.nativeimage.demos.rmi"
+
+repositories {
+    mavenCentral()
+    maven { url "https://jcenter.bintray.com" }
+}
+
+mainClassName = "org.graalvm.nativeimage.demos.rmi.Main"
+def imageName = "rmi"
+
+task nativei(type: Exec) {
+    commandLine 'native-image', '--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}",
+           '--no-fallback', '-cp', "${project.libsDir}/*", mainClassName, imageName
+}
+nativei.dependsOn(assemble)
+
+task runnative(type: Exec) {
+    commandLine "${project.buildDir}/$imageName"
+}
+runnative.dependsOn(nativei)
+
