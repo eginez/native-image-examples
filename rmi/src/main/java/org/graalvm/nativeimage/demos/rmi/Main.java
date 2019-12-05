@@ -9,7 +9,7 @@ public class Main {
    }
 
    public static void startServer(String port) throws Exception {
-      System.out.println("staring example");
+      System.out.println("staring server");
       LocateRegistry.createRegistry(Integer.parseInt(port));
       final String serverUrl = String.format("rmi://localhost:%s/encoder", port);
       Naming.rebind(serverUrl, new Server());

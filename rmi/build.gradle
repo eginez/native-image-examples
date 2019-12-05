@@ -17,7 +17,7 @@ def imageName = "rmi"
 
 task nativei(type: Exec) {
     commandLine 'native-image', '--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}",
-           '--no-fallback', '-cp', "${project.libsDir}/*", mainClassName, imageName
+           '--no-fallback', '-cp', "${project.libsDir}/*"
 }
 nativei.dependsOn(assemble)
 
