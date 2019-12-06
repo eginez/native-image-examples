@@ -16,8 +16,13 @@ mainClassName = "org.graalvm.nativeimage.demos.rmi.Main"
 def imageName = "rmi"
 
 task nativei(type: Exec) {
-    commandLine 'native-image', '--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}",
-           '--no-fallback', '-cp', "${project.libsDir}/*"
+    def execLine = ["native-image"]
+    if (project.hasProperty("debug")) {
+        execLine.add('--debug-attach')
+    }
+    execLine.addAll(['--verbose', '-H:+PrintClassInitialization', '--enable-all-security-services', "-H:Path=${project.buildDir}"])
+    execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*"])
+    setCommandLine(execLine)
 }
 nativei.dependsOn(assemble)
 
