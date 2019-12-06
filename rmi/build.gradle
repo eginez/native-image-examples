@@ -15,6 +15,14 @@ repositories {
 mainClassName = "org.graalvm.nativeimage.demos.rmi.Main"
 def imageName = "rmi"
 
+task runAgent(type: JavaExec) {
+    def defaultNativeImageResDir = "/META-INF/native-image/org.graalvm.nativeimage.demos.rmi/rmi"
+    jvmArgs "-agentlib:native-image-agent=config-output-dir=${sourceSets.main.resources.srcDirs.first()}/${defaultNativeImageResDir}"
+    classpath = sourceSets.main.runtimeClasspath
+    main = mainClassName
+}
+runAgent.dependsOn(classes)
+
 task nativei(type: Exec) {
     def execLine = ["native-image"]
     if (project.hasProperty("debug")) {
