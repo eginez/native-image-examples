@@ -1,0 +1,28 @@
+plugins {
+    id "java"
+}
+
+sourceSets {
+    main.java.srcDirs = [file('src/')]
+}
+
+['ProofOfWork'].each { f ->
+    def runTask = tasks.create(name:"run-$f", type: JavaExec) {
+        classpath = sourceSets.main.runtimeClasspath
+        main = f
+    }
+    runTask.dependsOn(classes)
+
+    def nativeiTask = tasks.create(name:"native-$f", type: Exec) {
+        def execLine = ["native-image"]
+        if (project.hasProperty("debug")) {
+            execLine.add('--debug-attach')
+        }
+        execLine.addAll(['--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}"])
+        execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*"])
+        execLine.addAll([f])
+        setCommandLine(execLine)
+    }
+    nativeiTask.dependsOn(assemble)
+}
+

@@ -3,7 +3,7 @@ import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.Duration;
 
-public class TestProfiles {
+public class ProofOfWork {
     public static void main(String[] args) throws Exception {
         System.out.println("starting test");
         int maxDuration = 5 * 1000;
