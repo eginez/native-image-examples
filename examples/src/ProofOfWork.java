@@ -4,6 +4,10 @@ import java.time.Instant;
 import java.time.Duration;
 
 public class ProofOfWork {
+    static {
+        System.out.println("Initializing ProofOfWork");
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println("starting test");
         int maxDuration = 5 * 1000;
@@ -11,7 +15,7 @@ public class ProofOfWork {
         String message = "some message";
         int i = 0;
         Instant start = Instant.now();
-        while(Duration.between(start, Instant.now()).toMillis() < maxDuration) {
+        while (Duration.between(start, Instant.now()).toMillis() < maxDuration) {
             String m = String.format("%s%d", message, i);
             digest.digest(m.getBytes("UTF-8"));
             i++;

@@ -6,7 +6,12 @@ sourceSets {
     main.java.srcDirs = [file('src/')]
 }
 
-['ProofOfWork'].each { f ->
+
+def extraArgsPerSample =  [
+        "StaticInit":["--initialize-at-build-time=StaticInit,ProofOfWork"]
+]
+
+['ProofOfWork', 'StaticInit'].each { f ->
     def runTask = tasks.create(name:"run-$f", type: JavaExec) {
         classpath = sourceSets.main.runtimeClasspath
         main = f
@@ -14,15 +19,22 @@ sourceSets {
     runTask.dependsOn(classes)
 
     def nativeiTask = tasks.create(name:"native-$f", type: Exec) {
+        def extraArgs = extraArgsPerSample[f]
         def execLine = ["native-image"]
         if (project.hasProperty("debug")) {
             execLine.add('--debug-attach')
         }
         execLine.addAll(['--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}"])
+        if (extraArgs != null) execLine.addAll(extraArgs)
         execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*"])
         execLine.addAll([f])
         setCommandLine(execLine)
     }
     nativeiTask.dependsOn(assemble)
+    
+    def runNativeTask = tasks.create(name: "runnative-$f", type: Exec) {
+        commandLine "${project.buildDir}/${f.toLowerCase()}"
+    }
+    runNativeTask.dependsOn(nativeiTask)
 }
 
