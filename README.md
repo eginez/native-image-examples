@@ -19,9 +19,9 @@ To build the rmi example
 To run the rest of the examples: Execute a gradle  `runnative+[JavaFileName]`. For example
 
 ```bash
-> ./gradlew runnative-StaticInit
+> ./gradlew runnative-examples.StaticInit
 or
-> ./gradlew runnative-ProofOfWork -Pdebug  #enables --debug--attach
+> ./gradlew runnative-examples.ProofOfWork -Pdebug  #enables --debug--attach
 ```
 
 

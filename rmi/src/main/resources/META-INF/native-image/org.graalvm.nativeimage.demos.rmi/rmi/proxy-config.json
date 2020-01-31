@@ -1,3 +1,0 @@
-[
-  ["java.rmi.Remote", "java.rmi.registry.Registry", "java.io.Serializable"]
-]

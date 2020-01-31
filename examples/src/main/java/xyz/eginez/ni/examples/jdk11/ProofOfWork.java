@@ -1,12 +1,11 @@
+package xyz.eginez.ni.examples.jdk11;
 
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.Duration;
 
+@Deprecated
 public class ProofOfWork {
-    static {
-        System.out.println("Initializing ProofOfWork");
-    }
 
     public static void main(String[] args) throws Exception {
         System.out.println("starting test");

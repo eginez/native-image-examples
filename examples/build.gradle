@@ -2,21 +2,43 @@ plugins {
     id "java"
 }
 
-sourceSets {
-    main.java.srcDirs = [file('src/')]
+//TODO look into configurations
+compileJava {
+    if (System.getProperty("java.version").contains("11.")) {
+        options.compilerArgs += ["--add-exports", "java.base/sun.text.spi=ALL-UNNAMED"]
+        options.compilerArgs += ["--add-exports", "java.base/sun.util.locale.provider=ALL-UNNAMED"]
+        options.compilerArgs += ['--add-exports', 'java.xml/com.sun.org.apache.xml.internal.serializer=ALL-UNNAMED']
+    }
+}
+
+sourceSets.main.java {
+        if (System.getProperty("java.version").contains("1.8")) {
+            exclude "**/jdk11/**"
+        } else {
+            exclude "**/jdk8/**"
+        }
 }
 
 
+
 def extraArgsPerSample =  [
-        "StaticInit":["--initialize-at-build-time=StaticInit,ProofOfWork"]
+        "StaticInit":["--initialize-at-build-time=ProofOfWork"],
+        "Examples":["-H:ReflectionConfigurationFiles=/Users/eginez/src/native-image-examples/examples/src/main/resources/reflect-config.json"],
 ]
 
-['ProofOfWork', 'StaticInit'].each { f ->
+['ProofOfWork','Examples'].each { f ->
     def runTask = tasks.create(name:"run-$f", type: JavaExec) {
         classpath = sourceSets.main.runtimeClasspath
-        main = f
+        main = "xyz.eginez.ni.examples.$f"
     }
     runTask.dependsOn(classes)
+
+    def runWithAgentTask = tasks.create(name: "run-agent-$f", type: JavaExec) {
+        classpath = sourceSets.main.runtimeClasspath
+        main = "xyz.eginez.ni.examples.$f"
+        jvmArgs = ["-agentlib:native-image-agent=config-output-dir=config/"]
+    }
+    runWithAgentTask.dependsOn(classes)
 
     def nativeiTask = tasks.create(name:"native-$f", type: Exec) {
         def extraArgs = extraArgsPerSample[f]
@@ -24,10 +46,10 @@ def extraArgsPerSample =  [
         if (project.hasProperty("debug")) {
             execLine.add('--debug-attach')
         }
-        execLine.addAll(['--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}"])
+        execLine.addAll(['--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}", "-H:Name=$f"])
         if (extraArgs != null) execLine.addAll(extraArgs)
         execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*"])
-        execLine.addAll([f])
+        execLine.addAll(["xyz.eginez.ni.examples." +f])
         setCommandLine(execLine)
     }
     nativeiTask.dependsOn(assemble)
@@ -37,4 +59,3 @@ def extraArgsPerSample =  [
     }
     runNativeTask.dependsOn(nativeiTask)
 }
-
