@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {"excludeClasses": "com.sun.xml.internal.bind.v2.runtime.reflect.opt.Injector"},
+    {"excludeClasses": "org.gradle.**"},
+    {"excludeClasses": "com.google.**"},
+    {"excludeClasses": "org.graalvm.compiler.**"}
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "resources":[
+    {"pattern":"\\QMETA-INF/services/jdk.vm.ci.hotspot.HotSpotJVMCIBackendFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/jdk.vm.ci.services.JVMCIServiceLocator\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.graalvm.compiler.core.match.MatchStatementSet\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.graalvm.compiler.debug.TTYStreamProvider\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.graalvm.compiler.hotspot.CompilerConfigurationFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.graalvm.compiler.hotspot.HotSpotBackendFactory\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.graalvm.compiler.hotspot.HotSpotGraalManagementRegistration\\E"}, 
+    {"pattern":"\\QMETA-INF/services/org.graalvm.compiler.nodes.graphbuilderconf.NodeIntrinsicPluginFactory\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/nodes/GraalHotSpotVMConfigNode.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/replacements/HotSpotAllocationSnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/replacements/HotSpotReplacementsUtil.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/replacements/HotSpotSerialWriteBarrierSnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/replacements/InstanceOfSnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/replacements/arraycopy/HotSpotArraycopySnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/stubs/ExceptionHandlerStub.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/hotspot/stubs/ForeignCallSnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/AllocationSnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/ReplacementsUtil.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/SnippetCounter.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/SnippetIntegerHistogram.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/arraycopy/ArrayCopyCallNode.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/arraycopy/ArrayCopySnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/compiler/replacements/gc/SerialWriteBarrierSnippets.class\\E"}, 
+    {"pattern":"\\Qorg/graalvm/word/LocationIdentity.class\\E"}, 
+    {"pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"}
+  ],
+  "bundles":[]
+}

@@ -1,32 +1,35 @@
+import java.nio.file.Paths
+import java.util.stream.Collectors
+
 plugins {
     id "java"
 }
 
-//TODO look into configurations
-compileJava {
-    if (System.getProperty("java.version").contains("11.")) {
-        options.compilerArgs += ["--add-exports", "java.base/sun.text.spi=ALL-UNNAMED"]
-        options.compilerArgs += ["--add-exports", "java.base/sun.util.locale.provider=ALL-UNNAMED"]
-        options.compilerArgs += ['--add-exports', 'java.xml/com.sun.org.apache.xml.internal.serializer=ALL-UNNAMED']
-    }
+repositories {
+    mavenCentral()
 }
 
-sourceSets.main.java {
-        if (System.getProperty("java.version").contains("1.8")) {
-            exclude "**/jdk11/**"
-        } else {
-            exclude "**/jdk8/**"
-        }
+dependencies {
+    testImplementation("junit:junit:4.13")
+    testCompile("com.google.guava:guava:23.5-jre")
 }
 
+test {
 
+    def configDir = Paths.get(projectDir.toString(), "src", "main", "resources", "META-INF", "native-image", project.name)
+    if (!configDir.toFile().exists())  configDir.toFile().mkdirs()
+    def agentArgs = [
+            //'config-merge-dir': configDir.toString(),
+            'config-output-dir': configDir.toString(),
+            'caller-filter-file': Paths.get(projectDir.toString(), "src", "test", "resources", "rules.json").toString(),
+    ]
+    def args = agentArgs.entrySet().stream().map{e -> "$e.key=$e.value"}.collect(Collectors.joining(","))
 
-def extraArgsPerSample =  [
-        "StaticInit":["--initialize-at-build-time=ProofOfWork"],
-        "Examples":["-H:ReflectionConfigurationFiles=/Users/eginez/src/native-image-examples/examples/src/main/resources/reflect-config.json"],
-]
+    jvmArgs  "-agentlib:native-image-agent=$args"
+}
 
-['ProofOfWork','Examples'].each { f ->
+/*
+['ProofOfWork', 'HelloWorld'].each { f ->
     def runTask = tasks.create(name:"run-$f", type: JavaExec) {
         classpath = sourceSets.main.runtimeClasspath
         main = "xyz.eginez.ni.examples.$f"
@@ -36,7 +39,7 @@ def extraArgsPerSample =  [
     def runWithAgentTask = tasks.create(name: "run-agent-$f", type: JavaExec) {
         classpath = sourceSets.main.runtimeClasspath
         main = "xyz.eginez.ni.examples.$f"
-        jvmArgs = ["-agentlib:native-image-agent=config-output-dir=config/"]
+        jvmArgs = ["-agentlib:native-image-agent=config-output-dir=config/,config-write-period-secs=1,config-write-initial-delay-secs=0"]
     }
     runWithAgentTask.dependsOn(classes)
 
@@ -46,9 +49,10 @@ def extraArgsPerSample =  [
         if (project.hasProperty("debug")) {
             execLine.add('--debug-attach')
         }
-        execLine.addAll(['--verbose', '--enable-all-security-services', "-H:Path=${project.buildDir}", "-H:Name=$f"])
+        execLine.addAll(['--verbose', '--allow-incomplete-classpath', '--enable-all-security-services', "-H:Path=${project.buildDir}", "-H:Name=$f"])
         if (extraArgs != null) execLine.addAll(extraArgs)
-        execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*"])
+        def rcp = sourceSets.main.runtimeClasspath.join(':')
+        execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*:$rcp"])
         execLine.addAll(["xyz.eginez.ni.examples." +f])
         setCommandLine(execLine)
     }
@@ -58,4 +62,4 @@ def extraArgsPerSample =  [
         commandLine "${project.buildDir}/${f.toLowerCase()}"
     }
     runNativeTask.dependsOn(nativeiTask)
-}
+ */

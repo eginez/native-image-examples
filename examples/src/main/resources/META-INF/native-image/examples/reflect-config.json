@@ -1,0 +1,21 @@
+[
+{
+  "name":"java.lang.ClassLoader",
+  "allDeclaredMethods":true
+},
+{
+  "name":"java.lang.Object",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true
+},
+{
+  "name":"org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker",
+  "methods":[{"name":"<init>","parameterTypes":["java.io.DataInputStream"] }]
+},
+{
+  "name":"xyz.eginez.ni.examples.ProofOfWorkTest",
+  "allDeclaredFields":true,
+  "allDeclaredMethods":true,
+  "allPublicConstructors":true
+}
+]
