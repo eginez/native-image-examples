@@ -26,5 +26,5 @@
     {"pattern":"\\Qorg/graalvm/word/LocationIdentity.class\\E"}, 
     {"pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"}
   ],
-  "bundles":[]
+  "bundles":[{"name":"messages"}]
 }

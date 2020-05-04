@@ -14,6 +14,7 @@ dependencies {
     testCompile("com.google.guava:guava:23.5-jre")
 }
 
+def testJvmArgs
 test {
 
     def configDir = Paths.get(projectDir.toString(), "src", "main", "resources", "META-INF", "native-image", project.name)
@@ -25,41 +26,74 @@ test {
     ]
     def args = agentArgs.entrySet().stream().map{e -> "$e.key=$e.value"}.collect(Collectors.joining(","))
 
-    jvmArgs  "-agentlib:native-image-agent=$args"
+    testJvmArgs = "-agentlib:native-image-agent=$args"
+    // jvmArgs testJvmArgs
 }
 
-/*
-['ProofOfWork', 'HelloWorld'].each { f ->
-    def runTask = tasks.create(name:"run-$f", type: JavaExec) {
-        classpath = sourceSets.main.runtimeClasspath
-        main = "xyz.eginez.ni.examples.$f"
-    }
-    runTask.dependsOn(classes)
+def customRun = tasks.create(name: "customRun", type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    //jvmArgs testJvmArgs
+    main = "xyz.eginez.ni.examples.${project.getProperties().get('main').toString()}"
+}
+customRun.dependsOn(classes)
 
-    def runWithAgentTask = tasks.create(name: "run-agent-$f", type: JavaExec) {
-        classpath = sourceSets.main.runtimeClasspath
-        main = "xyz.eginez.ni.examples.$f"
-        jvmArgs = ["-agentlib:native-image-agent=config-output-dir=config/,config-write-period-secs=1,config-write-initial-delay-secs=0"]
-    }
-    runWithAgentTask.dependsOn(classes)
+def customTest = tasks.create(name: "customTest", type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+    main = "org.junit.runner.JUnitCore"
+    args = ["xyz.eginez.ni.examples.HelloWorldLocalizedTest"]
+}
+customTest.dependsOn(classes)
 
-    def nativeiTask = tasks.create(name:"native-$f", type: Exec) {
-        def extraArgs = extraArgsPerSample[f]
-        def execLine = ["native-image"]
-        if (project.hasProperty("debug")) {
-            execLine.add('--debug-attach')
-        }
-        execLine.addAll(['--verbose', '--allow-incomplete-classpath', '--enable-all-security-services', "-H:Path=${project.buildDir}", "-H:Name=$f"])
-        if (extraArgs != null) execLine.addAll(extraArgs)
-        def rcp = sourceSets.main.runtimeClasspath.join(':')
-        execLine.addAll(['--no-fallback', '-cp', "${project.libsDir}/*:$rcp"])
-        execLine.addAll(["xyz.eginez.ni.examples." +f])
-        setCommandLine(execLine)
+def nativeBuild = tasks.create(name:"nativeBuild", type: Exec) {
+    def execLine = ["native-image"]
+    if (project.hasProperty("debug")) {
+        execLine.add('--debug-attach')
     }
-    nativeiTask.dependsOn(assemble)
-    
-    def runNativeTask = tasks.create(name: "runnative-$f", type: Exec) {
-        commandLine "${project.buildDir}/${f.toLowerCase()}"
+    def classMain = null
+    if (project.hasProperty("main")) {
+        classMain =  project.getProperties().get("main")
     }
-    runNativeTask.dependsOn(nativeiTask)
- */
+
+    def main = "xyz.eginez.ni.examples.$classMain"
+    execLine.addAll(['--verbose',
+                     '--no-server',
+                     '--allow-incomplete-classpath',
+                     '--enable-all-security-services',
+                     '-H:+ReportExceptionStackTraces',
+                     '-H:+TraceClassInitialization',
+                     '-H:IncludeResourceBundles=messages',
+                     '-H:IncludeLocales=all',
+                     "-H:Path=${project.buildDir}",
+                     "-H:Name=$classMain"])
+    def allcp = sourceSets.main.runtimeClasspath
+    def rcp = allcp.join(':')
+    execLine.addAll(['--no-fallback', '-cp', rcp])
+    execLine.add(main)
+    setCommandLine(execLine)
+}
+nativeBuild.dependsOn(classes)
+
+def runNative = tasks.create(name:"runNative", type: Exec) {
+    def classMain = null
+    if (project.hasProperty("main")) {
+        classMain =  project.getProperties().get("main")
+    }
+    def execLine = [project.buildDir.toPath().resolve(classMain.toString()).toString()]
+    setCommandLine(execLine)
+}
+runNative.dependsOn(nativeBuild)
+
+def nativeTestBuild = tasks.create(name:"nativeTestBuild", type: Exec) {
+    def execLine = ["native-image"]
+    if (project.hasProperty("debug")) {
+        execLine.add('--debug-attach')
+    }
+
+    execLine.addAll(['--verbose', '--allow-incomplete-classpath', '--enable-all-security-services', "-H:Path=${project.buildDir}", "-H:Name=TestExec"])
+    def allcp = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+    def rcp = allcp.join(':')
+    execLine.addAll(['--no-fallback', '-cp', rcp])
+    execLine.addAll(["org.junit.runner.JUnitCore"])
+    setCommandLine(execLine)
+}
+nativeTestBuild.dependsOn(classes)
